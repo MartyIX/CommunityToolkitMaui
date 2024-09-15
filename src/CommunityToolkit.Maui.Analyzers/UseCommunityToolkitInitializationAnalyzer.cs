@@ -26,22 +26,38 @@ public class UseCommunityToolkitInitializationAnalyzer : DiagnosticAnalyzer
 	{
 		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 		context.EnableConcurrentExecution();
-		context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.ExpressionStatement);
+		context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.GenericName);
 	}
 
 	static void AnalyzeNode(SyntaxNodeAnalysisContext context)
 	{
-		var expressionStatement = (ExpressionStatementSyntax)context.Node;
-		var root = expressionStatement.SyntaxTree.GetRoot();
+		GenericNameSyntax genericNameSyntax = (GenericNameSyntax)context.Node;
 
-		var methodDeclarationWithoutWhiteSpace = GetAllMethodDelcarationsWithoutWhiteSpace(root);
-
-		if (methodDeclarationWithoutWhiteSpace.Contains(".UseMauiApp<") && !methodDeclarationWithoutWhiteSpace.Contains(".UseMauiCommunityToolkit("))
+		if (genericNameSyntax.Identifier.Text == "UseMauiApp")
 		{
-			var expression = GetInvocationExpressionSyntax(expressionStatement);
-			var diagnostic = Diagnostic.Create(rule, expression.GetLocation());
-			context.ReportDiagnostic(diagnostic);
+			if (genericNameSyntax.Parent is SyntaxNode parentSyntaxNode) 
+			{
+				foreach (SyntaxNode child in parentSyntaxNode.ChildNodes())
+				{
+					if (child is ExpressionSyntax expressionSyntax) 
+					{
+
+					}
+				}
+			}
 		}
+
+		//var expressionStatement = (ExpressionStatementSyntax)context.Node;
+		//var root = expressionStatement.SyntaxTree.GetRoot();
+
+		//var methodDeclarationWithoutWhiteSpace = GetAllMethodDelcarationsWithoutWhiteSpace(root);
+
+		//if (methodDeclarationWithoutWhiteSpace.Contains(".UseMauiApp<") && !methodDeclarationWithoutWhiteSpace.Contains(".UseMauiCommunityToolkit("))
+		//{
+		//	var expression = GetInvocationExpressionSyntax(expressionStatement);
+		//	var diagnostic = Diagnostic.Create(rule, expression.GetLocation());
+		//	context.ReportDiagnostic(diagnostic);
+		//}
 	}
 
 	static string GetAllMethodDelcarationsWithoutWhiteSpace(SyntaxNode root)
